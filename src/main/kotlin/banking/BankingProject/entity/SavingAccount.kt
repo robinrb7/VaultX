@@ -26,10 +26,20 @@ open class SavingAccount(
 
 ): Account(){
 
+    //only used by Hibernate internally to load data from database to entity
     constructor() : this(
         0.05,      // interestRate
         false,     // isFlexiEnabled
         1000.00,   // flexiThreshold
         100.00     // minimumBalance
     )
+
+    //custom constructor for service class
+    constructor(
+        balance: Double,
+        customer: Customer
+    ) : this() {
+        this.balance = balance
+        this.customer = customer
+    }
 }

@@ -13,7 +13,6 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import kotlin.random.Random
 
 @Entity
 @Table(name="accounts")
@@ -25,26 +24,22 @@ open class Account(
     val accountNumber: Long = 0,
 
     @Column(nullable = false, unique = true)
-    val ifscCode: String = getIfscCode(),
+    var ifscCode: String = "",
 
     @Column(nullable= false)
-    val balance: Double = 0.0,
+    var balance: Double = 0.0,
+
+    @Column(nullable = false)
+    var accountType: String? = "SAVINGS",
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
-    val customer : Customer? = null,
+    var customer: Customer? = null,
 
     @OneToOne(mappedBy = "account", cascade = [CascadeType.ALL], orphanRemoval = true)
     val accountSecurity: AccountSecurity? = null,
 
-){
-    companion object{
-        fun getIfscCode(): String{
-            val branchCode = Random.nextInt(1000,9999)
-            return "BNK0$branchCode"
-
-        }
-    }
+    ){
 
     constructor() : this(
         0,                    // accountNumber

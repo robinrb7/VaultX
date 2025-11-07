@@ -22,8 +22,15 @@ open class CurrentAccount(
 ): Account(){
 
     constructor() : this(
-        20000.00,
-        5000.00,
+        500000.00,
+        10000.00,
         ""
     )
+
+    // ✅ Used in AccountService
+    constructor(balance: Double, businessName: String, customer: Customer)
+            : this(500000.00, 10000.00, businessName) {
+        this.balance = balance
+        this.customer = customer
+    }
 }

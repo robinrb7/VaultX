@@ -39,4 +39,12 @@ open class FixedDepositAccount(
         LocalDate.now().plusMonths(12), // maturityDate
         false         // autoRenewal
     )
+
+    // ✅ Used in AccountService
+    constructor(principalAmount: Double, customer: Customer)
+            : this(principalAmount, 0.12, 12) {
+        this.balance = principalAmount
+        this.customer = customer
+    }
+
 }
