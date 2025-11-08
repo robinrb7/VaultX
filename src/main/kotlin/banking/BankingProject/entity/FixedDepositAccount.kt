@@ -2,6 +2,8 @@ package banking.BankingProject.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.persistence.Table
 import java.time.LocalDate
@@ -12,7 +14,7 @@ import java.time.LocalDate
 open class FixedDepositAccount(
 
     @Column(nullable = false)
-    val principalAmount: Double,
+    var principalAmount: Double,
 
     @Column(nullable = false)
     val interestRate: Double = 0.12,
@@ -21,13 +23,17 @@ open class FixedDepositAccount(
     val tenureMonths: Int = 12,
 
     @Column(nullable = false)
-    val startDate: LocalDate = LocalDate.now(),
+    var startDate: LocalDate = LocalDate.now(),
 
     @Column(nullable = false)
-    val maturityDate: LocalDate = startDate.plusMonths(tenureMonths.toLong()),
+    var maturityDate: LocalDate = startDate.plusMonths(tenureMonths.toLong()),
 
     @Column(nullable = false)
-    val autoRenewal: Boolean = false
+    val autoRenewal: Boolean = false,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var fdStatus: FixedDepositStatus = FixedDepositStatus.ACTIVE
 
 ): Account(){
 

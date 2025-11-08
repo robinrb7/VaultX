@@ -15,10 +15,10 @@ open class SavingAccount(
     var interestRate: Double = 0.05,
 
     @Column(nullable = false)
-    val isFlexiEnabled: Boolean = false,
+    var isFlexiEnabled: Boolean = false,
 
     @Column(nullable = false)
-    val flexiThreshold : Double = 1000.00,
+    var flexiThreshold : Double = 10000.00,
 
     @Column(nullable = false)
     val minimumBalance : Double = 100.00
@@ -30,7 +30,7 @@ open class SavingAccount(
     constructor() : this(
         0.05,      // interestRate
         false,     // isFlexiEnabled
-        1000.00,   // flexiThreshold
+        10000.00,   // flexiThreshold
         100.00     // minimumBalance
     )
 

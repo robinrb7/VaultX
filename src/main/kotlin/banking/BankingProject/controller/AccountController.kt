@@ -2,12 +2,14 @@ package banking.BankingProject.controller
 
 import banking.BankingProject.dto.AccountResponse
 import banking.BankingProject.dto.CreateAccountRequest
+import banking.BankingProject.dto.FlexiSettingsRequest
 import banking.BankingProject.security.JwtUtil
 import banking.BankingProject.service.AccountService
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -39,6 +41,31 @@ class AccountController(
         return ResponseEntity.ok(accountService.getAccounts(customerId))
     }
 
+
+    @DeleteMapping("/delete/{accountId}")
+    fun deleteAccount(
+        @PathVariable accountId: Long,
+        httpRequest: HttpServletRequest
+    ): ResponseEntity<Any>{
+        accountService.deleteAccount(accountId,httpRequest)
+
+        return ResponseEntity.ok("Account deleted successfully")
+
+    }
+
+    @PatchMapping("/flexi/update")
+    fun updateFlexi(
+        @RequestBody body: FlexiSettingsRequest,
+        httpRequest: HttpServletRequest
+    ): ResponseEntity<Any>{
+
+        val customerId = extractCustomerIdFromToken(httpRequest)
+        return accountService.updateFlexiSettings(customerId,body)
+
+    }
+
+
+
     private fun extractCustomerIdFromToken(request: HttpServletRequest): Long{
         val header = request.getHeader("Authorization")
             ?: throw IllegalArgumentException("Authorization header missing")
@@ -54,17 +81,6 @@ class AccountController(
         }
 
         return jwtUtil.getCustomerIdFromToken(token)
-
-    }
-
-    @DeleteMapping("/delete/{accountId}")
-    fun deleteAccount(
-        @PathVariable accountId: Long,
-        httpRequest: HttpServletRequest
-    ): ResponseEntity<Any>{
-        accountService.deleteAccount(accountId,httpRequest)
-
-        return ResponseEntity.ok("Account deleted successfully")
 
     }
 

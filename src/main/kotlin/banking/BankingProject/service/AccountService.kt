@@ -2,6 +2,7 @@ package banking.BankingProject.service
 
 import banking.BankingProject.dto.AccountResponse
 import banking.BankingProject.dto.CreateAccountRequest
+import banking.BankingProject.dto.FlexiSettingsRequest
 import banking.BankingProject.entity.Account
 import banking.BankingProject.entity.CurrentAccount
 import banking.BankingProject.entity.FixedDepositAccount
@@ -114,4 +115,72 @@ class AccountService(
         return ResponseEntity.ok(mapOf("message" to "Account deleted successfully"))
     }
 
+
+    fun updateFlexiSettings(
+        customerId: Long,
+        request: FlexiSettingsRequest
+        ): ResponseEntity<Any>{
+
+        val customer = customerRepository.findById(customerId)
+            .orElseThrow{ResponseStatusException(HttpStatus.NOT_FOUND,"Customer Not Found")}
+
+        val savingsAccount = accountRepository.findByCustomer(customer)
+            .filterIsInstance<SavingAccount>()
+            .firstOrNull()
+            ?: return ResponseEntity.badRequest().body(mapOf("error" to "No Savings Account found"))
+
+
+        // If Flexi is being disabled
+        if(!request.enableFlexi){
+            savingsAccount.isFlexiEnabled = false
+            savingsAccount.flexiThreshold = 0.00
+
+            accountRepository.save(savingsAccount)
+
+            return ResponseEntity.ok(mapOf(
+                "message" to "Flexi Savings disabled",
+                "isFlexiEnabled" to false,
+                "currentThreshold" to 0.00
+            ))
+
+        }
+
+        if (savingsAccount.isFlexiEnabled == request.enableFlexi) {
+            return ResponseEntity.ok(mapOf("message" to "No changes made. Flexi status is already ${request.enableFlexi}"))
+        }
+
+        val threshold = request.flexiThreshold
+            ?: return ResponseEntity.badRequest().body(mapOf("error" to "Flexi threshold is required when enabling Flexi"))
+
+
+        if(threshold < MIN_FLEXI_THRESHOLD){
+            return ResponseEntity.badRequest().body(mapOf("error" to "Flexi threshold must be at least ₹10,000"))
+        }
+
+        if (threshold > MAX_FLEXI_THRESHOLD) {
+            return ResponseEntity.badRequest()
+                .body(mapOf("error" to "Flexi threshold cannot exceed ₹1,00,000"))
+        }
+
+        // 🧩 Update fields
+        savingsAccount.isFlexiEnabled = true
+        savingsAccount.flexiThreshold = threshold
+
+        accountRepository.save(savingsAccount)
+
+
+        return ResponseEntity.ok(mapOf(
+            "message" to "Flexi Savings enabled with threshold ₹${request.flexiThreshold}",
+            "isFlexiEnabled" to true,
+            "currentThreshold" to threshold
+        ))
+
+    }
+
+    companion object {
+        const val MIN_FLEXI_THRESHOLD = 10000.00
+        const val MAX_FLEXI_THRESHOLD = 100000.00
+    }
+
 }
+
